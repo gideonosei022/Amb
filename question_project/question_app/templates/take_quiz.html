@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>{{ quiz.title }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    {% for q in questions %}
+        <div style="margin-bottom:20px;">
+            <p><b>{{ q.question_text }}</b></p>
+
+            {% if q.question_type == "mcq" %}
+                <label><input type="radio" name="{{ q.id }}" value="{{ q.option_a }}"> {{ q.option_a }}</label><br>
+                <label><input type="radio" name="{{ q.id }}" value="{{ q.option_b }}"> {{ q.option_b }}</label><br>
+                <label><input type="radio" name="{{ q.id }}" value="{{ q.option_c }}"> {{ q.option_c }}</label><br>
+                <label><input type="radio" name="{{ q.id }}" value="{{ q.option_d }}"> {{ q.option_d }}</label><br>
+            {% else %}
+                <textarea name="{{ q.id }}" rows="3" cols="40"></textarea>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <button type="submit">Submit Quiz</button>
+</form>
+
+{% endblock %}

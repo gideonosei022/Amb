@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Result</h2>
+
+<p><b>Score:</b> {{ result.score }} / {{ result.total_marks }}</p>
+<p><b>Percentage:</b> {{ result.percentage }}%</p>
+
+<hr>
+
+<h3>Answers</h3>
+
+<ul>
+    {% for ans in answers %}
+        <li>
+            <b>{{ ans.question.question_text }}</b><br>
+            Your Answer: {{ ans.selected_answer }}<br>
+            Correct Answer: {{ ans.question.correct_answer }}
+        </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

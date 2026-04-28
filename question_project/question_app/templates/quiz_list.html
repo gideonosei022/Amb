@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>All Quizzes</h2>
+
+{% if user.is_teacher %}
+    <a href="{% url 'create_quiz' %}">+ Create Quiz</a>
+{% endif %}
+
+<ul>
+    {% for quiz in quizzes %}
+        <li>
+            <b>{{ quiz.title }}</b> — created by {{ quiz.created_by.username }}
+
+            {% if user.is_teacher and quiz.created_by == user %}
+                | <a href="{% url 'quiz_detail' quiz.id %}">View</a>
+                | <a href="{% url 'delete_quiz' quiz.id %}">Delete</a>
+            {% else %}
+                | <a href="{% url 'take_quiz' quiz.id %}">Take Quiz</a>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

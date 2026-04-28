@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Register (Student Only)</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <p>
+        <label>Username:</label><br>
+        {{ form.username }}
+        {{ form.username.errors }}
+    </p>
+
+    <p>
+        <label>Email:</label><br>
+        {{ form.email }}
+        {{ form.email.errors }}
+    </p>
+
+    <p>
+        <label>Contact Number:</label><br>
+        {{ form.contact_number }}
+        {{ form.contact_number.errors }}
+    </p>
+
+    <p>
+        <label>Password:</label><br>
+        {{ form.password1 }}
+        {{ form.password1.errors }}
+    </p>
+
+    <p>
+        <label>Confirm Password:</label><br>
+        {{ form.password2 }}
+        {{ form.password2.errors }}
+    </p>
+
+    <button type="submit">Register</button>
+
+</form>
+
+<p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+
+{% endblock %}

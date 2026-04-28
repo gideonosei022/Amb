@@ -1,0 +1,35 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz App</title>
+</head>
+<body>
+
+    <nav>
+        <a href="{% url 'home' %}">Home</a> |
+        <a href="{% url 'quiz_list' %}">Quizzes</a> |
+        
+        {% if user.is_authenticated %}
+            {% if user.is_teacher %}
+                <a href="{% url 'create_quiz' %}">Create Quiz</a> |
+                <a href="{% url 'add_question' %}">Add Question</a> |
+            {% endif %}
+            <span>Welcome, {{ user.username }} ({% if user.is_teacher %}Teacher{% else %}Student{% endif %})</span> |
+            {% if user.is_superuser %}
+                <a href="/admin/">Admin</a> |
+            {% endif %}
+            <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a> |
+            <a href="{% url 'register' %}">Register</a>
+        {% endif %}
+    </nav>
+
+    <hr>
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>

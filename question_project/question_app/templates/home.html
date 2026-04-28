@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Welcome to Quiz System</h2>
+
+{% if user.is_teacher %}
+    <p>You are logged in as <b>Teacher</b></p>
+    <a href="{% url 'create_quiz' %}">Create Quiz</a>
+{% else %}
+    <p>You are logged in as <b>Student</b></p>
+{% endif %}
+
+{% endblock %}
