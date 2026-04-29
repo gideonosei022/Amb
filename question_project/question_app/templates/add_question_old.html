@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Add Question</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <!-- Common Fields -->
+    <fieldset style="border: 1px solid #ddd; padding: 15px; margin-bottom: 20px;">
+        <legend style="font-weight: bold; padding: 0 10px;"><strong>Question Details</strong></legend>
+
+        <div style="margin-bottom: 15px;">
+            <label for="id_quiz"><strong>Quiz:</strong></label><br>
+            {{ form.quiz }}
+            {{ form.quiz.errors }}
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="id_title"><strong>Question Title:</strong></label><br>
+            {{ form.title }}
+            <small style="color: #666;">Give your question a descriptive title</small><br>
+            {{ form.title.errors }}
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="id_question_type"><strong>Question Type:</strong></label><br>
+            {{ form.question_type }}
+            {{ form.question_type.errors }}
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="id_marks"><strong>Marks:</strong></label><br>
+            {{ form.marks }}
+            {{ form.marks.errors }}
+        </div>
+    </fieldset>
+
+    <!-- Multiple Choice Section -->
+    <fieldset id="mcq-section" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; display: none;">
+        <legend style="font-weight: bold; padding: 0 10px;"><strong>Multiple Choice Question</strong></legend>
+
+        <div style="margin-bottom: 15px;">
+            <label for="id_question_text"><strong>Question:</strong></label><br>
+            {{ form.question_text }}
+            <small style="color: #666;">Type your multiple choice question here</small><br>
+            {{ form.question_text.errors }}
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div>
+                <label for="id_option_a"><strong>Option A:</strong></label><br>
+                {{ form.option_a }}
+                {{ form.option_a.errors }}
+            </div>
+
+            <div>
+                <label for="id_option_b"><strong>Option B:</strong></label><br>
+                {{ form.option_b }}
+                {{ form.option_b.errors }}
+            </div>
+
+            <div>
+                <label for="id_option_c"><strong>Option C:</strong></label><br>
+                {{ form.option_c }}
+                {{ form.option_c.errors }}
+            </div>
+
+            <div>
+                <label for="id_option_d"><strong>Option D:</strong></label><br>
+                {{ form.option_d }}
+                {{ form.option_d.errors }}
+            </div>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <label for="id_correct_answer"><strong>Correct Answer:</strong></label><br>
+            {{ form.correct_answer }}
+            <small style="color: #666;">Enter the correct option (A, B, C, or D)</small><br>
+            {{ form.correct_answer.errors }}
+        </div>
+    </fieldset>
+
+    <!-- Theory Section -->
+    <fieldset id="theory-section" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; display: none;">
+        <legend style="font-weight: bold; padding: 0 10px;"><strong>Theory Question</strong></legend>
+
+        <div style="margin-bottom: 15px;">
+            <label for="id_question_text"><strong>Question:</strong></label><br>
+            {{ form.question_text }}
+            <small style="color: #666;">Type your theory question here</small><br>
+            {{ form.question_text.errors }}
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="id_correct_answer"><strong>Expected Answer:</strong></label><br>
+            {{ form.correct_answer }}
+            <small style="color: #666;">Provide the expected answer or key points</small><br>
+            {{ form.correct_answer.errors }}
+        </div>
+    </fieldset>
+
+    <!-- Help Section -->
+    <div id="help-section" style="border: 1px solid #ffa500; background-color: #fff3cd; padding: 15px; margin-bottom: 20px;">
+        <strong>Instructions:</strong>
+        <ol>
+            <li>Select a <strong>Quiz</strong> from the dropdown</li>
+            <li>Choose <strong>Question Type</strong> (MCQ or Theory)</li>
+            <li>Fill in the question details in the section that appears</li>
+            <li>Click <strong>Save Question</strong> to add it to your quiz</li>
+        </ol>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 4px;">Save Question</button>
+        <a href="{% url 'quiz_list' %}" style="padding: 10px 20px; background-color: #888; color: white; text-decoration: none; margin-left: 10px; border-radius: 4px;">Cancel</a>
+    </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const questionTypeSelect = document.getElementById('id_question_type');
+    const mcqSection = document.getElementById('mcq-section');
+    const theorySection = document.getElementById('theory-section');
+
+    function toggleSections() {
+        const selectedType = questionTypeSelect.value;
+        if (selectedType === 'mcq') {
+            mcqSection.style.display = 'block';
+            theorySection.style.display = 'none';
+        } else if (selectedType === 'theory') {
+            mcqSection.style.display = 'none';
+            theorySection.style.display = 'block';
+        } else {
+            mcqSection.style.display = 'none';
+            theorySection.style.display = 'none';
+        }
+    }
+
+    questionTypeSelect.addEventListener('change', toggleSections);
+    toggleSections(); // Initial check
+});
+</script>
+
+{% endblock %}

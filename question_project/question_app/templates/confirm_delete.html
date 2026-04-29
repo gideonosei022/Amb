@@ -7,8 +7,15 @@
 <p>Are you sure you want to delete this {{ object_type|lower }}?</p>
 
 <div style="border: 1px solid #ccc; padding: 15px; margin: 20px 0; background-color: #f9f9f9;">
-    <h3>{{ object.title|default:object.question_text }}</h3>
-
+        <h3>
+            {% if object.title %}
+                {{ object.title }}
+            {% elif object.question_text %}
+                {{ object.question_text }}
+            {% else %}
+                {{ object_type }}
+            {% endif %}
+        </h3>
     {% if object.created_by %}
         <p><strong>Created by:</strong> {{ object.created_by.username }}</p>
     {% endif %}

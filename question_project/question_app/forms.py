@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from django.forms import formset_factory
 from .models import Quiz, Question, Submission, User
 
 
@@ -200,3 +201,13 @@ class SubmissionForm(forms.ModelForm):
             submission.save()
 
         return submission
+
+
+# 📝 QUESTION FORMSET (FOR MULTIPLE QUESTIONS)
+QuestionFormSet = formset_factory(
+    QuestionForm,
+    extra=1,  # Start with 1 empty form
+    can_delete=True,  # Allow deleting forms
+    min_num=1,  # At least 1 form required
+    validate_min=True
+)

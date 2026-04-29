@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 
 from .models import Quiz, Question, Submission, Answer, Result
-from .forms import QuizForm, QuestionForm, UserRegistrationForm
+from .forms import QuizForm, QuestionForm, QuestionFormSet, UserRegistrationForm
 
 # Create your views here.
 def home(request):
@@ -35,7 +35,7 @@ def register(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('home')
 
 @login_required
 def create_quiz(request):
@@ -62,7 +62,18 @@ def upload_question(request, quiz_id=None):
         initial['quiz'] = quiz_id
 
     if request.method == "POST":
-        form = QuestionForm(request.POST, user=request.user)
+        # Create a mutable copy of POST data
+        post_data = request.POST.copy()
+        
+        # Set default values for fields not in the upload form
+        if 'question_type' not in post_data:
+            post_data['question_type'] = 'theory'  # Default to theory for URL uploads
+        if 'correct_answer' not in post_data:
+            post_data['correct_answer'] = 'To be evaluated manually'  # Default answer
+        if 'marks' not in post_data:
+            post_data['marks'] = '1'  # Default marks
+        
+        form = QuestionForm(post_data, user=request.user)
         if form.is_valid():
             form.save()
             return redirect('quiz_detail', quiz_id=form.cleaned_data['quiz'].id)
@@ -100,14 +111,23 @@ def add_question(request, quiz_id=None):
         initial['quiz'] = quiz_id
 
     if request.method == "POST":
-        form = QuestionForm(request.POST, user=request.user)
-        if form.is_valid():
-            question = form.save()
-            return redirect('quiz_detail', quiz_id=question.quiz.id)
-    else:
-        form = QuestionForm(user=request.user, initial=initial)
+        formset = QuestionFormSet(request.POST, form_kwargs={'user': request.user})
+        if formset.is_valid():
+            saved_questions = []
+            for form in formset:
+                if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                    question = form.save()
+                    saved_questions.append(question)
 
-    return render(request, 'add_question.html', {'form': form})
+            if saved_questions:
+                # Redirect to the quiz detail of the first saved question
+                return redirect('quiz_detail', quiz_id=saved_questions[0].quiz.id)
+    else:
+        # Create formset with initial data
+        initial_data = [initial] if initial else [{}]
+        formset = QuestionFormSet(form_kwargs={'user': request.user}, initial=initial_data)
+
+    return render(request, 'add_question.html', {'formset': formset})
 
 @login_required
 def take_quiz(request, quiz_id):
@@ -116,8 +136,7 @@ def take_quiz(request, quiz_id):
 
     quiz = get_object_or_404(Quiz, id=quiz_id)
 
-    if Submission.objects.filter(student=request.user, quiz=quiz).exists():
-        return HttpResponse("You have already taken this quiz.")
+    # Removed check for existing submission to allow unlimited attempts
 
     questions = quiz.questions.all()
 

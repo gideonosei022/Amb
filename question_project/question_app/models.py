@@ -122,8 +122,7 @@ class Submission(models.Model):
 
     submitted_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        unique_together = ('student', 'quiz')
+    # Removed unique_together to allow multiple submissions per student per quiz
 
     def clean(self):
         # Validation moved to SubmissionForm.clean() to avoid issues during form validation
