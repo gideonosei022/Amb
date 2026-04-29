@@ -14,11 +14,15 @@ urlpatterns = [
     path('quiz/<int:quiz_id>/', views.quiz_detail, name='quiz_detail'),
 
     path('question/add/', views.add_question, name='add_question'),
+    path('question/add/<int:quiz_id>/', views.add_question, name='add_question_quiz'),
+    path('question/upload-url/', views.upload_question, name='upload_question'),
+    path('question/upload-url/<int:quiz_id>/', views.upload_question, name='upload_question_quiz'),
 
     path('quiz/<int:quiz_id>/take/', views.take_quiz, name='take_quiz'),
 
     # ✅ THIS MUST MATCH YOUR VIEW NAME
     path('quiz/<int:quiz_id>/delete/', views.delete_quiz, name='delete_quiz'),
+    path('question/<int:question_id>/delete/', views.delete_question, name='delete_question'),
 
     path('result/<int:submission_id>/', views.result_view, name='result'),
 ]

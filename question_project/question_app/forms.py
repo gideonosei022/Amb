@@ -31,7 +31,7 @@ class UserRegistrationForm(UserCreationForm):
 class QuizForm(forms.ModelForm):
     class Meta:
         model = Quiz
-        fields = ['title', 'source_file_url']  # ❌ removed "section"
+        fields = ['title']
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -73,6 +73,7 @@ class QuestionForm(forms.ModelForm):
         model = Question
         fields = [
             'quiz',
+            'title',              # question title/label
             'question_text',     # direct typed question
             'question_url',      # pasted question link
             'question_type',

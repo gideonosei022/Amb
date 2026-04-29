@@ -53,18 +53,23 @@ def create_quiz(request):
     return render(request, 'create_quiz.html', {'form': form})
 
 @login_required
-def upload_question(request):
-    if request.method == "POST":
-        form = QuestionForm(request.POST)
+def upload_question(request, quiz_id=None):
+    if not request.user.is_teacher:
+        return HttpResponse("Unauthorized", status=403)
 
+    initial = {}
+    if quiz_id is not None:
+        initial['quiz'] = quiz_id
+
+    if request.method == "POST":
+        form = QuestionForm(request.POST, user=request.user)
         if form.is_valid():
             form.save()
-            return redirect('success')
-
+            return redirect('quiz_detail', quiz_id=form.cleaned_data['quiz'].id)
     else:
-        form = QuestionForm()
+        form = QuestionForm(user=request.user, initial=initial)
 
-    return render(request, 'upload.html', {'form': form})
+    return render(request, 'upload_question.html', {'form': form})
 
 @login_required
 def quiz_list(request):
@@ -86,17 +91,21 @@ def quiz_detail(request, quiz_id):
     })
 
 @login_required
-def add_question(request):
+def add_question(request, quiz_id=None):
     if not request.user.is_teacher:
         return HttpResponse("Unauthorized", status=403)
+
+    initial = {}
+    if quiz_id is not None:
+        initial['quiz'] = quiz_id
 
     if request.method == "POST":
         form = QuestionForm(request.POST, user=request.user)
         if form.is_valid():
-            form.save()
-            return redirect('quiz_list')
+            question = form.save()
+            return redirect('quiz_detail', quiz_id=question.quiz.id)
     else:
-        form = QuestionForm(user=request.user)
+        form = QuestionForm(user=request.user, initial=initial)
 
     return render(request, 'add_question.html', {'form': form})
 
@@ -168,6 +177,24 @@ def delete_quiz(request, quiz_id):
     return render(request, 'confirm_delete.html', {
         'object': quiz,
         'object_type': 'Quiz'
+    })
+
+
+@login_required
+def delete_question(request, question_id):
+    question = get_object_or_404(Question, id=question_id)
+
+    if not request.user.is_teacher or question.quiz.created_by != request.user:
+        return HttpResponse("Unauthorized", status=403)
+
+    if request.method == "POST":
+        quiz_id = question.quiz.id
+        question.delete()
+        return redirect('quiz_detail', quiz_id=quiz_id)
+
+    return render(request, 'confirm_delete.html', {
+        'object': question,
+        'object_type': 'Question'
     })
 
 

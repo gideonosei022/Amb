@@ -4,20 +4,34 @@
 
 <h2>{{ quiz.title }}</h2>
 
-<a href="{% url 'add_question' %}">+ Add Question</a>
+<p>
+    <a href="{% url 'add_question_quiz' quiz.id %}">+ Add Question</a>
+    |
+    <a href="{% url 'upload_question_quiz' quiz.id %}">+ Upload Question URL</a>
+</p>
 
 <hr>
 
 <h3>Questions</h3>
 
+{% if questions %}
 <ul>
     {% for q in questions %}
         <li>
-            {{ q.question_text }} ({{ q.question_type }})
-
+            <strong>{{ q.title|default:q.question_text }}</strong>
+            {% if not q.title and q.question_text %}
+                - {{ q.question_text }}
+            {% endif %}
+            ({{ q.question_type }})
+            {% if q.question_url %}
+                | <a href="{{ q.question_url }}" target="_blank">Link</a>
+            {% endif %}
             | <a href="{% url 'delete_question' q.id %}">Delete</a>
         </li>
     {% endfor %}
 </ul>
+{% else %}
+<p>No questions have been added to this quiz yet.</p>
+{% endif %}
 
 {% endblock %}

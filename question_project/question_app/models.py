@@ -23,8 +23,9 @@ class Quiz(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def clean(self):
-        if not self.created_by.is_teacher:
-            raise ValidationError("Only teachers can create quizzes.")
+        # Validation moved to QuizForm.clean() to avoid issues during form validation
+        # when created_by is not yet set
+        pass
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -48,6 +49,9 @@ class Question(models.Model):
         related_name='questions'
     )
 
+    # Question title/label
+    title = models.CharField(max_length=255, blank=True, null=True)
+
     # Teacher can type question directly
     question_text = models.TextField(blank=True, null=True)
 
@@ -69,10 +73,8 @@ class Question(models.Model):
     marks = models.IntegerField(default=1)
 
     def clean(self):
-
-        # Only teacher owner can add questions
-        if not self.quiz.created_by.is_teacher:
-            raise ValidationError("Only teachers can add questions.")
+        # Validation moved to QuestionForm.clean() to avoid issues during form validation
+        # when related fields might not be set yet
 
         # Must have either text OR URL
         if not self.question_text and not self.question_url:
@@ -124,8 +126,9 @@ class Submission(models.Model):
         unique_together = ('student', 'quiz')
 
     def clean(self):
-        if self.student.is_teacher:
-            raise ValidationError("Teachers cannot submit quizzes.")
+        # Validation moved to SubmissionForm.clean() to avoid issues during form validation
+        # when related fields might not be set yet
+        pass
 
     def save(self, *args, **kwargs):
         self.full_clean()

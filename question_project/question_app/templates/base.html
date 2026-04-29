@@ -14,6 +14,7 @@
             {% if user.is_teacher %}
                 <a href="{% url 'create_quiz' %}">Create Quiz</a> |
                 <a href="{% url 'add_question' %}">Add Question</a> |
+                <a href="{% url 'upload_question' %}">Upload Question URL</a> |
             {% endif %}
             <span>Welcome, {{ user.username }} ({% if user.is_teacher %}Teacher{% else %}Student{% endif %})</span> |
             {% if user.is_superuser %}

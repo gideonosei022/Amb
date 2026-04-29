@@ -5,7 +5,11 @@
 <h2>All Quizzes</h2>
 
 {% if user.is_teacher %}
-    <a href="{% url 'create_quiz' %}">+ Create Quiz</a>
+    <p>
+        <a href="{% url 'create_quiz' %}">+ Create Quiz</a> |
+        <a href="{% url 'add_question' %}">+ Add Question</a> |
+        <a href="{% url 'upload_question' %}">+ Upload Question URL</a>
+    </p>
 {% endif %}
 
 <ul>

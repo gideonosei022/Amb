@@ -1,7 +1,41 @@
-<h2>Upload Question</h2>
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Upload Question via URL</h2>
 
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save</button>
+    
+    <fieldset style="border: 1px solid #ddd; padding: 15px; margin-bottom: 20px;">
+        <legend style="font-weight: bold; padding: 0 10px;"><strong>Upload Your Question</strong></legend>
+        
+        <div style="margin-bottom: 20px;">
+            <label for="id_quiz"><strong>📚 Select Quiz:</strong></label><br>
+            {{ form.quiz }}
+            <small style="color: #666;">Choose the quiz to add this question to</small><br>
+            {{ form.quiz.errors }}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="id_title"><strong>📝 Question Title:</strong></label><br>
+            {{ form.title }}
+            <small style="color: #666;">Give your question a descriptive title</small><br>
+            {{ form.title.errors }}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="id_question_url"><strong>🔗 Paste URL Link:</strong></label><br>
+            {{ form.question_url }}
+            <small style="color: #666;">Paste the URL containing the question</small><br>
+            {{ form.question_url.errors }}
+        </div>
+    </fieldset>
+
+    <div style="margin-top: 20px;">
+        <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 4px;">Upload Question</button>
+        <a href="{% url 'quiz_list' %}" style="padding: 10px 20px; background-color: #888; color: white; text-decoration: none; margin-left: 10px; border-radius: 4px;">Cancel</a>
+    </div>
 </form>
+
+{% endblock %}
