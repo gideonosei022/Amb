@@ -65,9 +65,49 @@ class QuestionForm(forms.ModelForm):
     correct_answer = forms.CharField(
         widget=forms.Textarea(attrs={
             'rows': 4,
-            'placeholder': 'Enter correct answer'
+            'placeholder': 'Enter the correct answer or option letter.'
         }),
         required=True
+    )
+    sub_answer_a = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'rows': 2,
+            'placeholder': 'Answer for subquestion a'
+        }),
+        required=False,
+        label='Answer slot a'
+    )
+    sub_answer_b = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'rows': 2,
+            'placeholder': 'Answer for subquestion b'
+        }),
+        required=False,
+        label='Answer slot b'
+    )
+    sub_answer_c = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'rows': 2,
+            'placeholder': 'Answer for subquestion c'
+        }),
+        required=False,
+        label='Answer slot c'
+    )
+    sub_answer_d = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'rows': 2,
+            'placeholder': 'Answer for subquestion d'
+        }),
+        required=False,
+        label='Answer slot d'
+    )
+    sub_answer_e = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'rows': 2,
+            'placeholder': 'Answer for subquestion e'
+        }),
+        required=False,
+        label='Answer slot e'
     )
 
     class Meta:
@@ -75,13 +115,16 @@ class QuestionForm(forms.ModelForm):
         fields = [
             'quiz',
             'title',              # question title/label
-            'question_text',     # direct typed question
+            'question_number',    # editable question number
             'question_url',      # pasted question link
+            'section',
+            'question_text',     # direct typed question
             'question_type',
             'option_a',
             'option_b',
             'option_c',
             'option_d',
+            'option_e',
             'correct_answer',
             'marks'
         ]
@@ -95,6 +138,14 @@ class QuestionForm(forms.ModelForm):
             'question_url': forms.URLInput(attrs={
                 'placeholder': 'Paste URL containing question'
             }),
+            
+            'question_number': forms.NumberInput(attrs={
+                'placeholder': 'Question number'
+            }),
+            
+            'section': forms.Select(attrs={
+                'style': 'width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;'
+            }),
         }
 
     def __init__(self, *args, **kwargs):
@@ -102,7 +153,7 @@ class QuestionForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         # MCQ options optional by default
-        for field in ['option_a', 'option_b', 'option_c', 'option_d']:
+        for field in ['option_a', 'option_b', 'option_c', 'option_d', 'option_e']:
             self.fields[field].required = False
 
         # quiz filtering by teacher
@@ -151,14 +202,15 @@ class QuestionForm(forms.ModelForm):
                     'option_a',
                     'option_b',
                     'option_c',
-                    'option_d'
+                    'option_d',
+                    'option_e'
                 ]
                 if not cleaned_data.get(f)
             ]
 
             if missing:
                 raise forms.ValidationError(
-                    "All options (A, B, C, D) are required for MCQ."
+                    "All options (A, B, C, D, E) are required for MCQ."
                 )
 
         # Theory question
@@ -167,6 +219,22 @@ class QuestionForm(forms.ModelForm):
             cleaned_data['option_b'] = None
             cleaned_data['option_c'] = None
             cleaned_data['option_d'] = None
+            cleaned_data['option_e'] = None
+
+            sub_answers = []
+            for label, field_name in [
+                ('a', 'sub_answer_a'),
+                ('b', 'sub_answer_b'),
+                ('c', 'sub_answer_c'),
+                ('d', 'sub_answer_d'),
+                ('e', 'sub_answer_e')
+            ]:
+                value = cleaned_data.get(field_name)
+                if value:
+                    sub_answers.append(f"{label}. {value.strip()}")
+
+            if sub_answers:
+                cleaned_data['correct_answer'] = '\n'.join(sub_answers)
 
         return cleaned_data
     
@@ -209,5 +277,14 @@ QuestionFormSet = formset_factory(
     extra=1,  # Start with 1 empty form
     can_delete=True,  # Allow deleting forms
     min_num=1,  # At least 1 form required
+    validate_min=True
+)
+
+# 🧪 PREVIEW FORMSET (URL preview only, no extra blank form)
+PreviewQuestionFormSet = formset_factory(
+    QuestionForm,
+    extra=0,
+    can_delete=True,
+    min_num=1,
     validate_min=True
 )

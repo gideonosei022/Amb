@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load format_extras %}
+
+{% block content %}
+
+<h2>{{ quiz.title }} — {{ section_label }}</h2>
+
+<p>
+    <a href="{% url 'add_question_quiz_section' quiz.id section %}">+ Add Question to {{ section_label }}</a>
+    |
+    <a href="{% url 'upload_question_quiz_section' quiz.id section %}">+ Upload Question URL</a>
+    |
+    <a href="{% url 'quiz_detail' quiz.id %}">Back to Quiz</a>
+</p>
+
+<hr>
+
+{% if questions %}
+<ul>
+    {% for q in questions %}
+        <li>
+            {% if q.question_number %}
+                <strong style="color: #0066cc;">Q{{ q.question_number }}:</strong>
+            {% endif %}
+            {% if q.question_text %}
+                <strong>{{ q.title|default:q.question_text|format_question }}</strong>
+                {% if q.title and q.question_text %}
+                    - {{ q.question_text|format_question }}
+                {% endif %}
+            {% elif q.question_url %}
+                <strong>Question from URL</strong>
+                | <a href="{{ q.question_url }}" target="_blank">View source</a>
+            {% else %}
+                <strong>Question</strong>
+            {% endif %}
+            ({{ q.question_type }})
+            | <a href="{% url 'edit_question' q.id %}">Edit</a>
+            | <a href="{% url 'delete_question' q.id %}">Delete</a>
+        </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No questions have been added to {{ section_label }} yet.</p>
+{% endif %}
+
+{% endblock %}

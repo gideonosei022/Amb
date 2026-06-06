@@ -2,7 +2,23 @@
 
 {% block content %}
 
-<h2>Add Multiple Questions</h2>
+<h2>Add Multiple Questions{% if section %} to Section {{ section }}{% endif %}</h2>
+
+<noscript>
+    <style>
+        .mcq-section,
+        .theory-section {
+            display: block !important;
+        }
+        #add-question,
+        .remove-question {
+            display: none !important;
+        }
+    </style>
+    <div style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; margin-bottom: 20px;">
+        <strong>JavaScript is disabled.</strong> This page will still work for basic question creation, but dynamic controls like adding or removing extra question blocks require JavaScript. Use the visible question form fields below and submit the form to save your questions.
+    </div>
+</noscript>
 
 <form method="post" id="question-form">
     {% csrf_token %}
@@ -19,11 +35,16 @@
     <div id="questions-container">
         {% for form in formset %}
         <div class="question-form" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; position: relative;">
-            {% if forloop.first %}
-            <h3>Question {{ forloop.counter }}</h3>
-            {% else %}
-            <h3>Question {{ forloop.counter }} <button type="button" class="remove-question" style="float: right; background: #f44336; color: white; border: none; padding: 5px 10px; cursor: pointer;">Remove</button></h3>
-            {% endif %}
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div>
+                    <label for="{{ form.question_number.id_for_label }}" style="font-weight: bold;">Question #:</label>
+                    {{ form.question_number }}
+                    {{ form.question_number.errors }}
+                </div>
+                {% if not forloop.first %}
+                <button type="button" class="remove-question" style="background: #f44336; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px;">Remove</button>
+                {% endif %}
+            </div>
 
             <!-- Hidden delete field -->
             {{ form.DELETE }}
@@ -48,6 +69,13 @@
                     <label for="{{ form.question_type.id_for_label }}"><strong>Question Type:</strong></label><br>
                     {{ form.question_type }}
                     {{ form.question_type.errors }}
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label for="{{ form.section.id_for_label }}"><strong>Section:</strong></label><br>
+                    {{ form.section }}
+                    <small style="color: #666;">Select Section A for MCQ or Section B for Theory.</small><br>
+                    {{ form.section.errors }}
                 </div>
 
                 <div style="margin-bottom: 15px;">
@@ -97,10 +125,15 @@
                         {{ form.option_d }}
                         {{ form.option_d.errors }}
                     </div>
+                    <div>
+                        <label for="{{ form.option_e.id_for_label }}"><strong>Option E:</strong></label><br>
+                        {{ form.option_e }}
+                        {{ form.option_e.errors }}
+                    </div>
                 </div>
 
                 <div style="margin-top: 15px;">
-                    <small style="color: #666;">Fill all four options for multiple choice questions.</small>
+                    <small style="color: #666;">Fill all five options for multiple choice questions.</small>
                 </div>
             </fieldset>
 
@@ -193,6 +226,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 <legend style="font-weight: bold; padding: 0 10px;">Question Details</legend>
 
                 <div style="margin-bottom: 15px;">
+                    <label for="id_form-${questionCounter}-question_number"><strong>Question #:</strong></label><br>
+                    <input type="number" name="form-${questionCounter}-question_number" id="id_form-${questionCounter}-question_number" value="">
+                </div>
+
+                <div style="margin-bottom: 15px;">
                     <label for="id_form-${questionCounter}-quiz"><strong>Quiz:</strong></label><br>
                     <select name="form-${questionCounter}-quiz" id="id_form-${questionCounter}-quiz">
                         ${quizOptionsHtml}
@@ -206,6 +244,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         <option value="mcq">Multiple Choice</option>
                         <option value="theory">Theory</option>
                     </select>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label for="id_form-${questionCounter}-section"><strong>Section:</strong></label><br>
+                    <select name="form-${questionCounter}-section" id="id_form-${questionCounter}-section">
+                        <option value="A">Section A - MCQ</option>
+                        <option value="B">Section B - Theory</option>
+                    </select>
+                    <small style="color: #666;">Choose Section A for MCQ or Section B for Theory.</small>
                 </div>
 
                 <div style="margin-bottom: 15px;">
@@ -246,6 +293,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div>
                         <label for="id_form-${questionCounter}-option_d"><strong>Option D:</strong></label><br>
                         <input type="text" name="form-${questionCounter}-option_d" id="id_form-${questionCounter}-option_d">
+                    </div>
+                    <div>
+                        <label for="id_form-${questionCounter}-option_e"><strong>Option E:</strong></label><br>
+                        <input type="text" name="form-${questionCounter}-option_e" id="id_form-${questionCounter}-option_e">
                     </div>
                 </div>
 

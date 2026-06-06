@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load format_extras %}
 
 {% block content %}
 
@@ -14,7 +15,7 @@
 <ul>
     {% for ans in answers %}
         <li>
-            <b>{{ ans.question.question_text }}</b><br>
+            <b>{{ ans.question.question_text|format_question }}</b><br>
             Your Answer: {{ ans.selected_answer }}<br>
             Correct Answer: {{ ans.question.correct_answer }}
         </li>

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Edit Question</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <fieldset style="border: 1px solid #ddd; padding: 15px; margin-bottom: 20px;">
+        <legend style="font-weight: bold; padding: 0 10px;"><strong>Edit Question Details</strong></legend>
+
+        <div style="margin-bottom: 20px;">
+            <label for="id_quiz"><strong>📚 Quiz:</strong></label><br>
+            {{ form.quiz }}
+            <small style="color: #666;">The quiz this question belongs to</small><br>
+            {{ form.quiz.errors }}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="id_question_number"><strong>🔢 Question Number:</strong></label><br>
+            {{ form.question_number }}
+            <small style="color: #666;">Question number or sequence</small><br>
+            {{ form.question_number.errors }}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="id_title"><strong>📝 Question Title (Optional):</strong></label><br>
+            {{ form.title }}
+            <small style="color: #666;">Optional title for the question</small><br>
+            {{ form.title.errors }}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="id_question_text"><strong>❓ Question Text:</strong></label><br>
+            {{ form.question_text }}
+            <small style="color: #666;">The main question text</small><br>
+            {{ form.question_text.errors }}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="id_question_url"><strong>🔗 Question URL (Optional):</strong></label><br>
+            {{ form.question_url }}
+            <small style="color: #666;">Optional URL containing the question</small><br>
+            {{ form.question_url.errors }}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="id_question_type"><strong>📋 Question Type:</strong></label><br>
+            {{ form.question_type }}
+            <small style="color: #666;">Multiple Choice or Theory</small><br>
+            {{ form.question_type.errors }}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="id_section"><strong>Section:</strong></label><br>
+            {{ form.section }}
+            <small style="color: #666;">Section A = MCQ, Section B = Theory.</small><br>
+            {{ form.section.errors }}
+        </div>
+
+        {% if form.question_type.value == 'mcq' %}
+        <div style="margin-bottom: 20px;">
+            <label><strong>🔢 Options:</strong></label><br>
+            <label for="id_option_a">A: {{ form.option_a }}</label><br>
+            <label for="id_option_b">B: {{ form.option_b }}</label><br>
+            <label for="id_option_c">C: {{ form.option_c }}</label><br>
+            <label for="id_option_d">D: {{ form.option_d }}</label><br>
+            {{ form.option_a.errors }}
+            {{ form.option_b.errors }}
+            {{ form.option_c.errors }}
+            {{ form.option_d.errors }}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="id_correct_answer"><strong>✅ Correct Answer:</strong></label><br>
+            {{ form.correct_answer }}
+            <small style="color: #666;">The correct answer for MCQ</small><br>
+            {{ form.correct_answer.errors }}
+        </div>
+        {% endif %}
+
+        <div style="margin-bottom: 20px;">
+            <label for="id_marks"><strong>🎯 Marks:</strong></label><br>
+            {{ form.marks }}
+            <small style="color: #666;">Marks for this question</small><br>
+            {{ form.marks.errors }}
+        </div>
+    </fieldset>
+
+    <div style="margin-top: 20px;">
+        <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 4px;">Save Changes</button>
+        <a href="{% url 'quiz_detail' question.quiz.id %}" style="padding: 10px 20px; background-color: #888; color: white; text-decoration: none; margin-left: 10px; border-radius: 4px;">Cancel</a>
+    </div>
+</form>
+
+{% endblock %}

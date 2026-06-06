@@ -55,6 +55,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             'option_b',
             'option_c',
             'option_d',
+            'option_e',
             'correct_answer',
             'marks'
         ]
@@ -69,7 +70,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         q_type = data.get('question_type')
 
         if q_type == 'mcq':
-            for opt in ['option_a', 'option_b', 'option_c', 'option_d']:
+            for opt in ['option_a', 'option_b', 'option_c', 'option_d', 'option_e']:
                 if not data.get(opt):
                     raise serializers.ValidationError("All MCQ options are required.")
 
@@ -78,6 +79,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             data['option_b'] = None
             data['option_c'] = None
             data['option_d'] = None
+            data['option_e'] = None
 
         return data
     

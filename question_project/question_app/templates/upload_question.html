@@ -4,6 +4,162 @@
 
 <h2>Upload Question via URL</h2>
 
+{% if formset %}
+<form method="post">
+    {% csrf_token %}
+    {{ formset.management_form }}
+
+    <div style="margin-bottom: 20px; padding: 15px; background-color: #e9f7ef; border: 1px solid #c8e6c9;">
+        <strong>Source URL:</strong> <a href="{{ question_url }}" target="_blank">{{ question_url }}</a><br>
+        <strong>{{ formset.total_form_count }} question{{ formset.total_form_count|pluralize }} detected</strong>. Review and edit each extracted question before saving.
+        {% if section == 'A' %}
+        <div style="margin-top: 10px; color: #555;">If the link contains multiple-choice questions, choose <strong>Multiple Choice</strong> and fill the options for each extracted item.</div>
+        {% else %}
+        <div style="margin-top: 10px; color: #555;">Section B URL uploads are treated as theory questions. Use the subquestion answer slots for a/b/c if needed.</div>
+        {% endif %}
+    </div>
+
+    {% if formset.non_form_errors %}
+        <div style="color: #d9534f; margin-bottom: 20px;">
+            {{ formset.non_form_errors }}
+        </div>
+    {% endif %}
+
+    {% for form in formset %}
+        <div class="question-preview-row" data-prefix="{{ form.prefix }}" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div>
+                    <label for="{{ form.question_number.id_for_label }}" style="font-weight: bold;">Question #:</label>
+                    {{ form.question_number }}
+                    {{ form.question_number.errors }}
+                </div>
+                <span style="font-size: 12px; color: #666;">From URL: Question {{ forloop.counter }}</span>
+            </div>
+
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+                {% if hidden.errors %}
+                    <div style="color: #d9534f; margin-bottom: 10px;">{{ hidden.errors }}</div>
+                {% endif %}
+            {% endfor %}
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: inline-flex; align-items: center; gap: 8px;">
+                    {{ form.DELETE }}
+                    <span style="color: #d9534f;">Remove this question</span>
+                </label>
+            </div>
+
+            {% if form.non_field_errors %}
+                <div style="color: #d9534f; margin-bottom: 15px;">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div style="margin-bottom: 20px;">
+                <label for="{{ form.quiz.id_for_label }}"><strong>📚 Select Quiz:</strong></label><br>
+                {{ form.quiz }}
+                {{ form.quiz.errors }}
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label for="{{ form.question_type.id_for_label }}"><strong>Question Type:</strong></label><br>
+                {{ form.question_type }}
+                {{ form.question_type.errors }}
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label for="{{ form.question_text.id_for_label }}"><strong>✏️ Question Text:</strong></label><br>
+                {{ form.question_text }}
+                {{ form.question_text.errors }}
+            </div>
+
+            {% if section != 'B' %}
+            <div style="margin-bottom: 20px;">
+                <label for="{{ form.correct_answer.id_for_label }}"><strong>✅ Correct Answer:</strong></label><br>
+                {{ form.correct_answer }}
+                {{ form.correct_answer.errors }}
+                <small style="color: #666;">After extraction, indicate the correct answer for this question here.</small><br>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label for="correct_option_{{ form.prefix }}"><strong>Choose correct option</strong></label><br>
+                <select id="correct_option_{{ form.prefix }}" class="correct-option-select" data-prefix="{{ form.prefix }}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    <option value="">-- select correct option --</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                    <option value="E">E</option>
+                </select>
+                <small style="color: #666;">Choose the correct option letter for this question after extraction.</small>
+            </div>
+            {% else %}
+            {{ form.correct_answer.as_hidden }}
+            {% endif %}
+
+            {% if section == 'B' %}
+            <div style="margin-bottom: 20px; padding: 15px; background: #f7f7f7; border-radius: 6px;">
+                <strong>Theory subquestion answers</strong><br>
+                <small style="color: #666;">For Section B theory questions, fill separate answer slots for each identified subquestion.</small>
+                {% if form.subanswer_fields %}
+                    {% for label, field in form.subanswer_fields %}
+                        <div style="margin-top: 10px;">
+                            <label for="{{ field.id_for_label }}"><strong>{{ label }}.</strong></label><br>
+                            {{ field }}
+                            {{ field.errors }}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="margin-top: 10px; color: #666;">No subquestions detected for this extracted question.</div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if section != 'B' %}
+            <div style="margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label for="{{ form.option_a.id_for_label }}"><strong>Option A:</strong></label><br>
+                    {{ form.option_a }}
+                    {{ form.option_a.errors }}
+                </div>
+                <div>
+                    <label for="{{ form.option_b.id_for_label }}"><strong>Option B:</strong></label><br>
+                    {{ form.option_b }}
+                    {{ form.option_b.errors }}
+                </div>
+                <div>
+                    <label for="{{ form.option_c.id_for_label }}"><strong>Option C:</strong></label><br>
+                    {{ form.option_c }}
+                    {{ form.option_c.errors }}
+                </div>
+                <div>
+                    <label for="{{ form.option_d.id_for_label }}"><strong>Option D:</strong></label><br>
+                    {{ form.option_d }}
+                    {{ form.option_d.errors }}
+                </div>
+                <div>
+                    <label for="{{ form.option_e.id_for_label }}"><strong>Option E:</strong></label><br>
+                    {{ form.option_e }}
+                    {{ form.option_e.errors }}
+                </div>
+            </div>
+            {% endif %}
+
+            <div style="margin-bottom: 20px;">
+                <label for="{{ form.marks.id_for_label }}"><strong>Marks:</strong></label><br>
+                {{ form.marks }}
+                {{ form.marks.errors }}
+            </div>
+        </div>
+    {% endfor %}
+
+    <div style="margin-top: 20px;">
+        <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 4px;">Save All Questions</button>
+        <a href="{% url 'quiz_list' %}" style="padding: 10px 20px; background-color: #888; color: white; text-decoration: none; margin-left: 10px; border-radius: 4px;">Cancel</a>
+    </div>
+</form>
+{% else %}
 <form method="post">
     {% csrf_token %}
     
@@ -20,9 +176,41 @@
         <div style="margin-bottom: 20px;">
             <label for="id_question_url"><strong>🔗 Paste URL Link:</strong></label><br>
             {{ form.question_url }}
-            <small style="color: #666;">Paste the URL containing the question</small><br>
+            <small style="color: #666;">Paste the URL that contains the questions. Extraction will happen after submit.</small><br>
             {{ form.question_url.errors }}
         </div>
+
+        {% if section == 'B' %}
+        <div style="margin-bottom: 20px; padding: 15px; background: #f7f7f7; border-radius: 6px;">
+            <strong>Section B theory answer slots</strong><br>
+            <small style="color: #666;">For theory uploads, you can optionally fill separate answer slots for subquestions a through e after extraction.</small>
+            <div style="margin-top: 10px;">
+                <label for="{{ form.sub_answer_a.id_for_label }}"><strong>a.</strong></label><br>
+                {{ form.sub_answer_a }}
+                {{ form.sub_answer_a.errors }}
+            </div>
+            <div style="margin-top: 10px;">
+                <label for="{{ form.sub_answer_b.id_for_label }}"><strong>b.</strong></label><br>
+                {{ form.sub_answer_b }}
+                {{ form.sub_answer_b.errors }}
+            </div>
+            <div style="margin-top: 10px;">
+                <label for="{{ form.sub_answer_c.id_for_label }}"><strong>c.</strong></label><br>
+                {{ form.sub_answer_c }}
+                {{ form.sub_answer_c.errors }}
+            </div>
+            <div style="margin-top: 10px;">
+                <label for="{{ form.sub_answer_d.id_for_label }}"><strong>d.</strong></label><br>
+                {{ form.sub_answer_d }}
+                {{ form.sub_answer_d.errors }}
+            </div>
+            <div style="margin-top: 10px;">
+                <label for="{{ form.sub_answer_e.id_for_label }}"><strong>e.</strong></label><br>
+                {{ form.sub_answer_e }}
+                {{ form.sub_answer_e.errors }}
+            </div>
+        </div>
+        {% endif %}
     </fieldset>
 
     <div style="margin-top: 20px;">
@@ -30,5 +218,61 @@
         <a href="{% url 'quiz_list' %}" style="padding: 10px 20px; background-color: #888; color: white; text-decoration: none; margin-left: 10px; border-radius: 4px;">Cancel</a>
     </div>
 </form>
+{% endif %}
+
+<script>
+function syncCorrectOption(prefix) {
+    var container = document.querySelector('[data-prefix="' + prefix + '"]');
+    if (!container) return;
+
+    var optionA = container.querySelector('[name="' + prefix + '-option_a"]');
+    var optionB = container.querySelector('[name="' + prefix + '-option_b"]');
+    var optionC = container.querySelector('[name="' + prefix + '-option_c"]');
+    var optionD = container.querySelector('[name="' + prefix + '-option_d"]');
+    var optionE = container.querySelector('[name="' + prefix + '-option_e"]');
+    var correctInput = container.querySelector('[name="' + prefix + '-correct_answer"]');
+    var select = container.querySelector('.correct-option-select');
+
+    if (!correctInput || !select) return;
+
+    function updateSelectFromText() {
+        var text = correctInput.value.trim();
+        if (optionA && text === optionA.value.trim()) { select.value = 'A'; return; }
+        if (optionB && text === optionB.value.trim()) { select.value = 'B'; return; }
+        if (optionC && text === optionC.value.trim()) { select.value = 'C'; return; }
+        if (optionD && text === optionD.value.trim()) { select.value = 'D'; return; }
+        if (optionE && text === optionE.value.trim()) { select.value = 'E'; return; }
+        select.value = '';
+    }
+
+    function updateTextFromSelect() {
+        var value = select.value;
+        if (value === 'A' && optionA) correctInput.value = optionA.value;
+        if (value === 'B' && optionB) correctInput.value = optionB.value;
+        if (value === 'C' && optionC) correctInput.value = optionC.value;
+        if (value === 'D' && optionD) correctInput.value = optionD.value;
+        if (value === 'E' && optionE) correctInput.value = optionE.value;
+    }
+
+    select.addEventListener('change', updateTextFromSelect);
+    correctInput.addEventListener('input', updateSelectFromText);
+    if (optionA) optionA.addEventListener('input', updateSelectFromText);
+    if (optionB) optionB.addEventListener('input', updateSelectFromText);
+    if (optionC) optionC.addEventListener('input', updateSelectFromText);
+    if (optionD) optionD.addEventListener('input', updateSelectFromText);
+    if (optionE) optionE.addEventListener('input', updateSelectFromText);
+
+    updateSelectFromText();
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.correct-option-select').forEach(function (select) {
+        var row = select.closest('.question-preview-row');
+        if (!row) return;
+        var prefix = row.dataset.prefix;
+        syncCorrectOption(prefix);
+    });
+});
+</script>
 
 {% endblock %}

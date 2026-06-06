@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load format_extras %}
 
 {% block content %}
 
@@ -9,22 +10,30 @@
 
     {% for q in questions %}
         <div style="margin-bottom:20px;">
-            {% if q.question_text %}
-                <p><b>{{ q.question_text }}</b></p>
-            {% elif q.question_url %}
-                <p><b>Question from URL: <a href="{{ q.question_url }}" target="_blank">{{ q.question_url }}</a></b></p>
-                {% if q.title %}
-                    <p><em>{{ q.title }}</em></p>
+            <div style="margin-bottom: 10px;">
+                {% if q.question_number %}
+                    <span style="font-weight: bold; color: #666;">Question {{ q.question_number }}:</span>
                 {% endif %}
-            {% else %}
-                <p><b>Question</b></p>
-            {% endif %}
+                {% if q.question_text %}
+                    <p><b>{{ q.question_text|format_question }}</b></p>
+                {% elif q.question_url %}
+                    <p><b>Question from URL</b></p>
+                    {% if q.title %}
+                        <p><em>{{ q.title }}</em></p>
+                    {% endif %}
+                {% else %}
+                    <p><b>Question</b></p>
+                {% endif %}
+            </div>
 
             {% if q.question_type == "mcq" %}
                 <label><input type="radio" name="{{ q.id }}" value="{{ q.option_a }}"> {{ q.option_a }}</label><br>
                 <label><input type="radio" name="{{ q.id }}" value="{{ q.option_b }}"> {{ q.option_b }}</label><br>
                 <label><input type="radio" name="{{ q.id }}" value="{{ q.option_c }}"> {{ q.option_c }}</label><br>
                 <label><input type="radio" name="{{ q.id }}" value="{{ q.option_d }}"> {{ q.option_d }}</label><br>
+                {% if q.option_e %}
+                    <label><input type="radio" name="{{ q.id }}" value="{{ q.option_e }}"> {{ q.option_e }}</label><br>
+                {% endif %}
             {% else %}
                 <textarea name="{{ q.id }}" rows="3" cols="40"></textarea>
             {% endif %}

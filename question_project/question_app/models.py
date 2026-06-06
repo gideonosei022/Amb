@@ -63,14 +63,32 @@ class Question(models.Model):
         choices=QUESTION_TYPES
     )
 
+    SECTION_CHOICES = (
+        ('A', 'Section A - MCQ'),
+        ('B', 'Section B - Theory'),
+    )
+
+    section = models.CharField(
+        max_length=1,
+        choices=SECTION_CHOICES,
+        default='A'
+    )
+
     # MCQ options
     option_a = models.CharField(max_length=255, blank=True, null=True)
     option_b = models.CharField(max_length=255, blank=True, null=True)
     option_c = models.CharField(max_length=255, blank=True, null=True)
     option_d = models.CharField(max_length=255, blank=True, null=True)
+    option_e = models.CharField(max_length=255, blank=True, null=True)
 
     correct_answer = models.TextField()
     marks = models.IntegerField(default=1)
+    
+    # Question number (editable)
+    question_number = models.IntegerField(default=1, blank=True, null=True)
+    
+    # Context/preamble text before the question
+    preamble = models.TextField(blank=True, null=True, help_text="Text to display before the question (e.g., case study, scenario)")
 
     def clean(self):
         # Validation moved to QuestionForm.clean() to avoid issues during form validation
@@ -93,7 +111,8 @@ class Question(models.Model):
                 self.option_a,
                 self.option_b,
                 self.option_c,
-                self.option_d
+                self.option_d,
+                self.option_e
             ]):
                 raise ValidationError(
                     "All MCQ options are required."
@@ -105,6 +124,7 @@ class Question(models.Model):
             self.option_b = None
             self.option_c = None
             self.option_d = None
+            self.option_e = None
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -114,6 +134,14 @@ class Question(models.Model):
         if self.question_text:
             return self.question_text[:50]
         return f"Question Link: {self.question_url}"
+
+    @property
+    def display_text(self):
+        if self.question_text:
+            return self.question_text
+        if self.question_url:
+            return "Question from URL. The content could not be extracted."
+        return "Question"
 
     
 class Submission(models.Model):
